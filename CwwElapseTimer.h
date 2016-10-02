@@ -2,7 +2,7 @@
 //
 // Elapse Timer Class
 // ------------------
-// Code by W. Witt; V1.00-beta-01; July 2016
+// Code by W. Witt; V1.00-beta-02; July 2016
 //
 // *****************************************************************************
 
@@ -33,9 +33,10 @@ class CwwElapseTimer {
     void          setDuration     ( unsigned long duration );
     unsigned long valueOfDuration (); 
 
-    void          start   ();
-    void          stop    ();
-    void          restart ();
+    void          start  ( unsigned long duration );
+    void          start  ();
+    void          stop   ();
+    void          resume ();
 
     unsigned long elapsedTime ();
     boolean       hasElapsed  ();

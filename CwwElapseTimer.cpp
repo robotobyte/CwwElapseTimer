@@ -2,7 +2,7 @@
 //
 // Elapse Timer Class
 // -------------------
-// Code by W. Witt; V1.00-beta-01; July 2016
+// Code by W. Witt; V1.00-beta-02; XXX 2016
 //
 // ****************************************************************************
 
@@ -52,19 +52,18 @@ unsigned long CwwElapseTimer::valueOfDuration () {
 
 // ----------------------------------------------------------------------------
 
+void CwwElapseTimer::start ( unsigned long duration ) {
+
+  setDuration ( duration );
+  start ();
+
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 void CwwElapseTimer::start () {
 
-  unsigned long currentTime;
-
-  currentTime = millis ();
-
-  if ( currentTime < lastStartTime ) {
-    lastStartTime = ULONG_MAX - ( lastStartTime - currentTime );
-  }
-  else {
-    lastStartTime = currentTime - lastStartTime;
-  }
-
+  lastStartTime = millis ();
   isRunning = true;
 
 }
@@ -80,9 +79,19 @@ void CwwElapseTimer::stop () {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void CwwElapseTimer::restart () {
+void CwwElapseTimer::resume () {
 
-  lastStartTime = millis ();
+  unsigned long currentTime;
+
+  currentTime = millis ();
+
+  if ( currentTime < lastStartTime ) {
+    lastStartTime = ULONG_MAX - ( lastStartTime - currentTime );
+  }
+  else {
+    lastStartTime = currentTime - lastStartTime;
+  }
+
   isRunning = true;
 
 }
@@ -111,6 +120,7 @@ unsigned long CwwElapseTimer::elapsedTime () {
   else {
 
     return lastStartTime;
+
   }
 
 }
