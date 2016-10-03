@@ -2,7 +2,7 @@
 //
 // Elapse Timer Class
 // -------------------
-// Code by W. Witt; V1.00-beta-02; XXX 2016
+// Code by W. Witt; V1.00-beta-03; August 2016
 //
 // ****************************************************************************
 
@@ -10,6 +10,14 @@
 #include <Arduino.h>
 
 #include <CwwElapseTimer.h>
+
+// ============================================================================
+// Private Macros:
+// ============================================================================
+
+#define CWW_ELAPSE_TIMER_IS_IDLE    0x00
+#define CWW_ELAPSE_TIMER_IS_RUNNING 0x01
+#define CWW_ELAPSE_TIMER_IS_PAUSED  0x02
 
 // ============================================================================
 // Constructors, Destructor
@@ -22,7 +30,7 @@ CwwElapseTimer::CwwElapseTimer (
   this->duration = duration;
 
   lastStartTime = 0;
-  isRunning     = false;
+  status        = CWW_ELAPSE_TIMER_IS_IDLE;
 
 }
 
@@ -64,22 +72,31 @@ void CwwElapseTimer::start ( unsigned long duration ) {
 void CwwElapseTimer::start () {
 
   lastStartTime = millis ();
-  isRunning = true;
+  
+  status = CWW_ELAPSE_TIMER_IS_RUNNING;
 
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void CwwElapseTimer::stop () {
+boolean CwwElapseTimer::stop () {
 
   lastStartTime = elapsedTime ();
-  isRunning = false;
+  
+  if ( hasElapsed() ) {
+    status = CWW_ELAPSE_TIMER_IS_IDLE;
+    return false;
+  }
+  else {
+    status = CWW_ELAPSE_TIMER_IS_PAUSED;
+    return true;
+  }
 
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void CwwElapseTimer::resume () {
+boolean CwwElapseTimer::resume () {
 
   unsigned long currentTime;
 
@@ -92,7 +109,30 @@ void CwwElapseTimer::resume () {
     lastStartTime = currentTime - lastStartTime;
   }
 
-  isRunning = true;
+  if ( hasElapsed() ) {
+    status = CWW_ELAPSE_TIMER_IS_IDLE;
+    return false;
+  }
+  else {
+    status = CWW_ELAPSE_TIMER_IS_RUNNING;
+    return true;
+  }
+
+}
+
+// ----------------------------------------------------------------------------
+
+boolean CwwElapseTimer::isRunning () {
+
+  return status & CWW_ELAPSE_TIMER_IS_RUNNING;
+
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+boolean CwwElapseTimer::isPaused () {
+
+  return status & CWW_ELAPSE_TIMER_IS_PAUSED;
 
 }
 
@@ -103,7 +143,7 @@ unsigned long CwwElapseTimer::elapsedTime () {
   unsigned long currentTime;
   unsigned long elapsedTime;
 
-  if ( isRunning ) {
+  if ( isRunning() ) {
 
     currentTime = millis ();
 
